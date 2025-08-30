@@ -3,16 +3,21 @@ from flask_restx import Api, Resource
 from models import register_models
 
 app = Flask(__name__)
-api = Api(app, doc='/swagger', title='BlueWave API',
-          description='Telemetry and Desalination API')
+api = Api(
+    app,
+    doc='/swagger',
+    title='BlueWave API',
+    description='Telemetry and Desalination API'
+)
 
-# Register models
+# Register models from models.py
 models = register_models(api)
 observation_model = models["observation"]
 
-# Fake in-memory DB
+# In-memory database (temporary storage)
 observations = [
-    {"id": 1, "temperature": 23.5, "salinity": 35.1, "timestamp": "2025-08-28T00:45:00Z"}
+    {"id": 1, "temperature": 23.5, "salinity": 35.1, "timestamp": "2025-08-28T00:45:00Z"},
+    {"id": 2, "temperature": 24.1, "salinity": 34.9, "timestamp": "2025-08-28T01:00:00Z"}
 ]
 
 @api.route('/observations')
@@ -30,6 +35,12 @@ class Observations(Resource):
         new_obs['id'] = len(observations) + 1
         observations.append(new_obs)
         return new_obs, 201
+
+
+@app.route('/')
+def home():
+    """Default homepage"""
+    return {"message": "Welcome to BlueWave API! Visit /swagger for API docs."}
 
 
 if __name__ == '__main__':
